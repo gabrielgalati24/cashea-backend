@@ -1,8 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-@QueryHandler(Object)
-export class GetUserOrdersQueryHandler implements IQueryHandler<any> {
-  async execute(query: any) {
+export class GetUserOrdersQuery {
+  constructor(public readonly userId: number) {}
+}
+
+@QueryHandler(GetUserOrdersQuery)
+export class GetUserOrdersQueryHandler implements IQueryHandler<GetUserOrdersQuery> {
+  async execute(query: GetUserOrdersQuery) {
     return [];
   }
 }

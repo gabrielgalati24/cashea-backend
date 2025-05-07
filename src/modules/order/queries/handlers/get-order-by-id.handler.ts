@@ -1,8 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-@QueryHandler(Object)
-export class GetOrderByIdQueryHandler implements IQueryHandler<any> {
-  async execute(query: any) {
+export class GetOrderByIdQuery {
+  constructor(public readonly id: number) {}
+}
+
+@QueryHandler(GetOrderByIdQuery)
+export class GetOrderByIdQueryHandler implements IQueryHandler<GetOrderByIdQuery> {
+  async execute(query: GetOrderByIdQuery) {
     return null;
   }
 }
