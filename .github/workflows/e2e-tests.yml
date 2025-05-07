@@ -2,32 +2,47 @@ name: Run E2E Tests with TestContainers
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: false
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '24'
+        cache: 'pnpm'
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '24'
-          cache: pnpm
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        run_install: false
 
-      - name: Install dependencies
-        run: pnpm install
+    - name: Install dependencies
+      run: pnpm install
 
-      - uses: docker/setup-buildx-action@v2
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
 
-      - name: Run E2E Tests
-        run: pnpm run test:e2e
-        env:
-          NODE_ENV: test
+    - name: Create test environment file
+      run: |
+        echo "NODE_ENV=test" > .env.test
+        echo "JWT_SECRET=test123" >> .env.test
+        echo "JWT_REFRESH_SECRET=test456" >> .env.test
+
+    - name: Run E2E Tests
+      run: pnpm run test:e2e
+      env:
+        NODE_ENV: test
+        JWT_SECRET: test123
+        JWT_REFRESH_SECRET: test456
