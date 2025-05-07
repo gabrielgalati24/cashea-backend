@@ -30,15 +30,7 @@ import { RedisCacheModule } from './shared/cache/redis-cache.module';
     RedisCacheModule,
 
     // Rate limiting
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          name: 'default',
-          ttl: +(process.env.RATE_LIMIT_TTL || 60) * 1000,
-          limit: +(process.env.RATE_LIMIT_MAX || 100),
-        },
-      ]
-    }),
+    ThrottlerModule.forRoot(),
 
     // Logging
     LoggerModule.forRootAsync({
