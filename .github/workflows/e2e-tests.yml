@@ -12,6 +12,40 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_DATABASE }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_USER }}
+          RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_PASSWORD }}
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -37,12 +71,58 @@ jobs:
     - name: Create test environment file
       run: |
         echo "NODE_ENV=test" > .env.test
-        echo "JWT_SECRET=test123" >> .env.test
-        echo "JWT_REFRESH_SECRET=test456" >> .env.test
+        echo "PORT=3000" >> .env.test
+        echo "API_GATEWAY_PORT=3000" >> .env.test
+        echo "API_PREFIX=api" >> .env.test
+        echo "API_VERSION=v1" >> .env.test
+        echo "SWAGGER_PATH=docs" >> .env.test
+        echo "RATE_LIMIT_TTL=60" >> .env.test
+        echo "RATE_LIMIT_MAX=100" >> .env.test
+        echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
+        echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env.test
+        echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> .env.test
+        echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}" >> .env.test
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.test
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.test
+        echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.test
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.test
+        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env.test
+        echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env.test
+        echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env.test
+        echo "REDIS_TTL=${{ secrets.REDIS_TTL }}" >> .env.test
+        echo "RABBITMQ_URL=${{ secrets.RABBITMQ_URL }}" >> .env.test
+        echo "RABBITMQ_QUEUE_NAME=${{ secrets.RABBITMQ_QUEUE_NAME }}" >> .env.test
+        echo "RABBITMQ_USER_QUEUE=${{ secrets.RABBITMQ_USER_QUEUE }}" >> .env.test
+        echo "RABBITMQ_PRODUCT_QUEUE=${{ secrets.RABBITMQ_PRODUCT_QUEUE }}" >> .env.test
+        echo "RABBITMQ_ORDER_QUEUE=${{ secrets.RABBITMQ_ORDER_QUEUE }}" >> .env.test
+        echo "LOG_LEVEL=info" >> .env.test
 
     - name: Run E2E Tests
       run: pnpm run test:e2e
       env:
         NODE_ENV: test
-        JWT_SECRET: test123
-        JWT_REFRESH_SECRET: test456
+        PORT: 3000
+        API_GATEWAY_PORT: 3000
+        API_PREFIX: api
+        API_VERSION: v1
+        SWAGGER_PATH: docs
+        RATE_LIMIT_TTL: 60
+        RATE_LIMIT_MAX: 100
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+        JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+        JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
+        REDIS_HOST: ${{ secrets.REDIS_HOST }}
+        REDIS_PORT: ${{ secrets.REDIS_PORT }}
+        REDIS_TTL: ${{ secrets.REDIS_TTL }}
+        RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
+        RABBITMQ_QUEUE_NAME: ${{ secrets.RABBITMQ_QUEUE_NAME }}
+        RABBITMQ_USER_QUEUE: ${{ secrets.RABBITMQ_USER_QUEUE }}
+        RABBITMQ_PRODUCT_QUEUE: ${{ secrets.RABBITMQ_PRODUCT_QUEUE }}
+        RABBITMQ_ORDER_QUEUE: ${{ secrets.RABBITMQ_ORDER_QUEUE }}
+        LOG_LEVEL: info
