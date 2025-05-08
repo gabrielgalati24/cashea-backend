@@ -49,7 +49,6 @@ $ npm run start:dev
 # 5. Explora la doc ➜  http://localhost:3000/api
 ```
 
-> **Tip:** Ejecuta `npm run test` para correr la suite Jest y `npm run lint` para mantener el código limpio.
 
 ---
 
@@ -198,7 +197,7 @@ X‑Request‑Id: <uuid>            # se genera automáticamente si falta
 
 ```bash
 # e2e
-npm run e2e
+npm run test:e2e
 
 ```
 ![image](https://github.com/user-attachments/assets/35ff6b8d-1626-4840-a240-36d02bc824bc)
