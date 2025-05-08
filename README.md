@@ -94,49 +94,85 @@ X‑Request‑Id: <uuid>            # se genera automáticamente si falta
 ```
 
 ---
-
 ## 📦 Endpoints
 
 <details>
 <summary>🛒 Módulo de Productos</summary>
 
-| Método | Ruta                    | Auth      | Descripción           |
-| ------ | ----------------------- | --------- | --------------------- |
-| GET    | `/products/categories`  | Público   | Lista categorías      |
-| POST   | `/products/categories`  | **Admin** | Crea categoría        |
-| GET    | `/products/stats`       | **Admin** | Estadísticas globales |
-| POST   | `/products/:id/reviews` | Usuario   | Crea reseña           |
-| GET    | `/products/:id/reviews` | Público   | Reseñas paginadas     |
+| Método | Ruta                           | Auth      | Descripción                                      | Implementado |
+| ------ | ------------------------------ | --------- | ------------------------------------------------ | ------------ |
+| GET    | `/products/categories`         | Público   | Lista categorías                                 | ❌           |
+| POST   | `/products/categories`         | **Admin** | Crea categoría                                   | ❌           |
+| GET    | `/products/stats`              | **Admin** | Estadísticas globales                            | ❌           |
+| POST   | `/products/:id/reviews`        | Usuario   | Crea reseña                                      | ❌           |
+| GET    | `/products/:id/reviews`        | Público   | Reseñas paginadas                                | ❌           |
+| GET    | `/products`                    | Público   | Listar productos con paginación, filtros y búsqueda | ✅        |
+| GET    | `/products/:id`                | Público   | Obtener producto por ID                          | ✅           |
+| POST   | `/products`                    | **Admin** | Crear nuevo producto                             | ✅           |
+| POST   | `/products/bulk`               | **Admin** | Crear productos en lote                          | ✅           |
+| PUT    | `/products/:id`                | **Admin** | Actualizar producto                              | ✅           |
+| DELETE | `/products/:id`                | **Admin** | Eliminar producto                                | ✅           |
+| GET    | `/products/category/:category` | Público   | Listar productos por categoría                   | ✅           |
 
 </details>
 
 <details>
 <summary>📑 Módulo de Pedidos</summary>
 
-| Método | Ruta                  | Auth      | Descripción                 |
-| ------ | --------------------- | --------- | --------------------------- |
-| GET    | `/orders/stats`       | **Admin** | KPI de ingresos y pedidos   |
-| POST   | `/orders/:id/process` | **Admin** | Actualiza estado y notifica |
-| POST   | `/orders/:id/refund`  | **Admin** | Emite reembolso             |
-| GET    | `/orders/history`     | Usuario   | Historial paginado          |
+| Método | Ruta                      | Auth      | Descripción                           | Implementado |
+| ------ | ------------------------- | --------- | ------------------------------------- | ------------ |
+| GET    | `/orders/stats`           | **Admin** | KPI de ingresos y pedidos             | ❌           |
+| POST   | `/orders/:id/process`     | **Admin** | Actualiza estado y notifica           | ❌           |
+| POST   | `/orders/:id/refund`      | **Admin** | Emite reembolso                       | ❌           |
+| GET    | `/orders/history`         | Usuario   | Historial paginado                    | ❌           |
+| GET    | `/orders`                 | **Admin** | Obtener todos los pedidos             | ✅           |
+| GET    | `/orders/:id`             | **Admin** | Obtener pedido por ID                 | ✅           |
+| GET    | `/orders/user/:userId`    | Usuario   | Obtener pedidos de un usuario específico | ✅        |
+| POST   | `/orders`                 | Usuario   | Crear nuevo pedido                    | ✅           |
+| PUT    | `/orders/:id`             | **Admin** | Actualizar estado de pedido           | ✅           |
+| DELETE | `/orders/:id`             | **Admin** | Cancelar pedido                       | ✅           |
 
 </details>
 
 <details>
 <summary>👤 Módulo de Usuarios</summary>
 
-| Método | Ruta                 | Auth      | Descripción            |
-| ------ | -------------------- | --------- | ---------------------- |
-| GET    | `/users/profile`     | Usuario   | Perfil actual          |
-| PUT    | `/users/profile`     | Usuario   | Actualiza perfil       |
-| GET    | `/users/preferences` | Usuario   | Lee preferencias       |
-| PUT    | `/users/preferences` | Usuario   | Actualiza preferencias |
-| GET    | `/users/inactive`    | **Admin** | Usuarios inactivos     |
-| POST   | `/users/bulk-status` | **Admin** | Cambia estado en lote  |
+| Método | Ruta                    | Auth      | Descripción                   | Implementado |
+| ------ | ----------------------- | --------- | ----------------------------- | ------------ |
+| GET    | `/users/profile`        | Usuario   | Perfil actual                 | ❌           |
+| PUT    | `/users/profile`        | Usuario   | Actualiza perfil              | ❌           |
+| GET    | `/users/preferences`    | Usuario   | Lee preferencias              | ❌           |
+| PUT    | `/users/preferences`    | Usuario   | Actualiza preferencias        | ❌           |
+| GET    | `/users/inactive`       | **Admin** | Usuarios inactivos            | ❌           |
+| POST   | `/users/bulk-status`    | **Admin** | Cambia estado en lote         | ❌           |
+| GET    | `/users`                | **Admin** | Obtener todos los usuarios    | ✅           |
+| GET    | `/users/:id`            | **Admin** | Obtener usuario por ID        | ✅           |
+| POST   | `/users`                | **Admin** | Crear nuevo usuario           | ✅           |
+| PUT    | `/users/:id`            | Usuario   | Actualizar perfil de usuario  | ✅           |
+| DELETE | `/users/:id`            | **Admin** | Eliminar usuario              | ✅           |
 
 </details>
 
----
+<details>
+<summary>🔐 Módulo de Autenticación</summary>
+
+| Método | Ruta             | Auth    | Descripción               | Implementado |
+| ------ | ---------------- | ------- | ------------------------- | ------------ |
+| POST   | `/auth/register` | Público | Registrar nuevo usuario   | ✅           |
+| POST   | `/auth/login`    | Público | Inicio de sesión          | ✅           |
+| POST   | `/auth/refresh`  | Público | Refrescar token de acceso | ✅           |
+
+</details>
+
+<details>
+<summary>❤️ Health Check</summary>
+
+| Método | Ruta      | Auth    | Descripción                 | Implementado |
+| ------ | --------- | ------- | --------------------------- | ------------ |
+| GET    | `/health` | Público | Estado de salud del sistema | ✅           |
+
+</details>
+
 
 ## 🛡️ Políticas Globales
 
@@ -161,21 +197,10 @@ X‑Request‑Id: <uuid>            # se genera automáticamente si falta
 ## 🧪 Ejecutar Pruebas
 
 ```bash
-# Unit y e2e
-npm run test
+# e2e
+npm run e2e
 
-# Watch mode
-npm run test:watch
 ```
+![image](https://github.com/user-attachments/assets/35ff6b8d-1626-4840-a240-36d02bc824bc)
 
----
 
-## 🐳 Despliegue en Producción
-
-1. Construye la imagen:
-
-   ```bash
-   docker build -t cool‑nestjs‑api:latest .
-   ```
-2. Sube y ejecuta en tu plataforma de orquestación (Docker Swarm, Kubernetes, Render, Fly.io, etc.).
-3. Añade variables de entorno y apunta el load‑balancer al **`PORT`**.
