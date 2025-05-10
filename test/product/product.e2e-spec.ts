@@ -20,8 +20,8 @@ describe('ProductController (e2e)', () => {
   let createdProductId: string;
 
   beforeAll(async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     if (!testDbConfig) {
       throw new Error(
         'Test database configuration is not available. Make sure setup-e2e.ts is properly configured.',
@@ -110,17 +110,14 @@ describe('ProductController (e2e)', () => {
     jwtToken = registerResponse.body.data.accessToken;
 
     const dataSource = moduleFixture.get(getConnectionToken());
-    await dataSource.query(
-      "UPDATE users SET roles = ARRAY['admin', 'user'] WHERE email = $1",
-      [testUser.email]
-    );
+    await dataSource.query("UPDATE users SET roles = ARRAY['admin', 'user'] WHERE email = $1", [
+      testUser.email,
+    ]);
 
-    const loginResponse = await request(app.getHttpServer())
-      .post('/api/v1/auth/login')
-      .send({
-        email: testUser.email,
-        password: testUser.password,
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/api/v1/auth/login').send({
+      email: testUser.email,
+      password: testUser.password,
+    });
 
     jwtToken = loginResponse.body.data.accessToken;
   });
@@ -138,9 +135,8 @@ describe('ProductController (e2e)', () => {
       price: 89.95,
       stock: 120,
       categories: ['Electronics', 'Computer Accessories', 'Keyboards'],
-      isActive: true
+      isActive: true,
     };
-
 
     const response = await request(app.getHttpServer())
       .post('/api/v1/products')
@@ -153,7 +149,7 @@ describe('ProductController (e2e)', () => {
     expect(response.body).toHaveProperty('data');
     expect(response.body).toHaveProperty('statusCode', 201);
     expect(response.body).toHaveProperty('timestamp');
-    
+
     expect(response.body.data).toHaveProperty('id');
     createdProductId = response.body.data.id;
     expect(response.body.data).toHaveProperty('name', newProduct.name);
@@ -166,5 +162,4 @@ describe('ProductController (e2e)', () => {
     expect(response.body.data).toHaveProperty('createdAt');
     expect(response.body.data).toHaveProperty('updatedAt');
   });
-
-}); 
+});

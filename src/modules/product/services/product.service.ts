@@ -62,4 +62,44 @@ export class ProductService {
 
     return this.productRepository.findByCategory(category, { skip, take: limit });
   }
+
+  async getProductStats(): Promise<{
+    totalProducts: number;
+    activeProducts: number;
+    lowStockProducts: number;
+    categoriesCount: Record<string, number>;
+  }> {
+    const [products, total] = await this.productRepository.findAll({
+      skip: 0,
+      take: 1000,
+    });
+
+    const categoriesMap: Record<string, number> = {};
+    let activeCount = 0;
+    let lowStockCount = 0;
+
+    products.forEach((product: Product) => {
+      if (product.isActive) {
+        activeCount++;
+      }
+
+      if (product.stock < 5) {
+        lowStockCount++;
+      }
+
+      product.categories.forEach((category: string) => {
+        if (!categoriesMap[category]) {
+          categoriesMap[category] = 0;
+        }
+        categoriesMap[category]++;
+      });
+    });
+
+    return {
+      totalProducts: total,
+      activeProducts: activeCount,
+      lowStockProducts: lowStockCount,
+      categoriesCount: categoriesMap,
+    };
+  }
 }

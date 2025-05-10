@@ -37,6 +37,15 @@ export class ProductController {
     return this.productService.findAll({ page, limit, category, search });
   }
 
+  @Get('stats')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Obtener estadísticas globales de productos' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Estadísticas obtenidas con éxito' })
+  @UseInterceptors(CacheInterceptor)
+  async getStats() {
+    return this.productService.getProductStats();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Product retrieved successfully' })
