@@ -4,7 +4,8 @@ import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderRepository } from '../repositories/order.repository';
 import { Order, OrderStatus } from '../entities/order.entity';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, MessagePattern, Payload, Ctx, RmqContext } from '@nestjs/microservices';
+import { OrderQueueHelperService } from './order-queue-helper.service';
 
 @Injectable()
 export class OrderService {
@@ -15,6 +16,7 @@ export class OrderService {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     @Inject('EVENT_BUS') private readonly eventBusClient: ClientProxy,
+    private readonly orderQueueHelperService: OrderQueueHelperService,
   ) {}
 
   async findAll(options?: { page?: number; limit?: number; status?: string }) {
@@ -88,10 +90,32 @@ export class OrderService {
   }
 
   @MessagePattern('order_created_send_email')
-  async handleOrderCreatedEmail(
-    @Payload() data: { orderId: string; userId: string; totalAmount: number },
-  ) {
-    this.logger.log(`Received 'order_created_send_email' event for order ${data.orderId}`);
-    this.logger.log(`Simulating email sending to user related to order ${data.orderId}...`);
+  async handleOrderCreatedSendEmail(@Payload() data: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    try {
+      this.logger.log(`Processing message for order_created_send_email: ${JSON.stringify(data)}`);
+      if (data.shouldFail) {
+         throw new Error("Simulated processing error for email sending.");
+      }
+      
+      this.logger.log('Message processed successfully, acknowledging.');
+      channel.ack(originalMsg);
+    } catch (error) {
+      this.logger.error(`Failed to process message for order_created_send_email. Error: ${error.message}`, error.stack);
+      try {
+        await this.orderQueueHelperService.handleMessageFailure(originalMsg, error);
+        channel.ack(originalMsg);
+        this.logger.log('Message handed off to OrderQueueHelperService; original message acknowledged.');
+      } catch (helperError) {
+        this.logger.error(
+          `CRITICAL: OrderQueueHelperService failed. Error: ${helperError.message}`,
+          helperError.stack
+        );
+        channel.nack(originalMsg, false, false); 
+        this.logger.log('Original message NACKed (not requeued) due to helper service failure.');
+      }
+    }
   }
 }
